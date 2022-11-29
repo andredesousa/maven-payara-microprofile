@@ -1,0 +1,58 @@
+pipeline {
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout([
+          $class: 'GitSCM',
+          branches: [[
+            name: '*/master'
+          ]],
+          doGenerateSubmoduleConfigurations: false,
+          userRemoteConfigs: [[
+            credentialsId: '',
+            url: ''
+          ]]
+        ])
+      }
+    }
+    stage('Build App') {
+      steps {
+        sh './mvnw install -DskipTests'
+      }
+    }
+    stage('Code Analysis') {
+      steps {
+        sh './mvnw checkstyle:check'
+      }
+    }
+    stage('Unit Tests') {
+      steps {
+        sh './mvnw test'
+      }
+    }
+    stage('Build Docker') {
+      steps {
+        sh 'docker build -t microprofile-api .'
+      }
+    }
+    stage('Integration Tests') {
+      steps {
+        sh './mvnw verify -DskipUTs'
+      }
+    }
+  }
+
+  post {
+    always {
+      publishHTML([
+        allowMissing: false,
+        alwaysLinkToLastBuild: false,
+        keepAll: false,
+        reportDir: 'target/site/jacoco/',
+        reportFiles: 'index.html',
+        reportName: 'Unit Tests Report'
+      ])
+      cleanWs()
+    }
+  }
+}
