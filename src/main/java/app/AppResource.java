@@ -19,5 +19,4 @@ public class AppResource {
     public String hello() {
         return this.appService.hello();
     }
-
 }

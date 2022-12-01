@@ -1,8 +1,9 @@
 # Essential MicroProfile Scaffold
 
-This project uses [MicroProfile](https://microprofile.io/), an open forum to optimize Enterprise Java for a microservices architecture.
+This project uses [MicroProfile](https://microprofile.io/), an open forum to optimize Enterprise Java for a microservices architecture, and [Payara Micro 5](https://www.payara.fish/).
+It was generated with [MicroProfile Starter](https://start.microprofile.io/).
 It provides a complete **RESTful API** configured, including build, test, and deploy scripts as examples.
-It is recommended to have, at least, **Java 11**, [Payara 5](https://www.payara.fish/), and [Docker](https://www.docker.com/) installed.
+It is recommended to have, at least, **Java 11**, [Node.js](https://nodejs.org/en/) and [Docker](https://www.docker.com/) installed.
 
 ## Table of Contents
 
@@ -28,6 +29,7 @@ Based on best practices from the community, other github projects and developer 
 ├── src
 |  ├── integration-test
 |  ├── main
+|  |  ├── docker
 |  |  ├── java
 |  |  |  └── app
 |  |  |     ├── AppResource.java
@@ -40,6 +42,8 @@ Based on best practices from the community, other github projects and developer 
 ├── .dockerignore
 ├── .editorconfig
 ├── .gitignore
+├── .prettierrc
+├── changelog.mustache
 ├── checkstyle.xml
 ├── Dockerfile
 ├── LICENSE
@@ -49,38 +53,64 @@ Based on best practices from the community, other github projects and developer 
 └── README.md
 ```
 
+All of the app's code goes in a folder named `src/main`.
+The unit tests and integration tests are in the `src/test` and `src/integration-test` folders.
+Static files are placed in `src/main/resources` folder.
+
 ## Running in development mode
 
-You can run the application on your local [Payara Server](https://www.payara.fish/) instance.
-First, you need to build the project. Use:
+You can run your application in dev mode that enables live coding.
+Use the next command to build and serve your application.
+
+To build and serve the application, you can use the next command:
 
 ```bash
-./mvnw clean install
+./mvnw package payara-micro:start
 ```
 
-After, you can deploy the [microprofile-api.war](target/microprofile-api.war) on Payara Server.
+Alternatively, you can run the application on your local [Payara Server](https://www.payara.fish/) instance.
+First, you need to build the project with `./mvnw clean package` command.
+After build de application, you can deploy the [microprofile-api.war](target/microprofile-api.war) on Payara Server.
 
-This app includes [Swagger](https://swagger.io/). It is available at <http://localhost:8080/microprofile-api/openapi-ui/>.
-
-The OpenAPI Specification is automatically generated on build. See the file [openapi.yaml](target/classes/META-INF/openapi.yaml).
+This application includes [Swagger](https://swagger.io/).
+It is available at <http://localhost:8080/microprofile-api/openapi-ui/>.
+The OpenAPI Specification is automatically generated.
+See the file [openapi.yaml](target/classes/META-INF/openapi.yaml).
 
 ## Linting and formatting code
 
 A linter is a static code analysis tool used to flag programming errors, bugs, stylistic errors and suspicious constructs.
 
-This project includes [Checkstyle](https://checkstyle.sourceforge.io/).
-Checkstyle finds class design problems, method design problems, and others. It also has the ability to check code layout and formatting issues.
-Use the next command to check your code style.
+It includes [Prettier](https://prettier.io/), [Checkstyle](https://checkstyle.sourceforge.io/), [PMD](https://pmd.github.io/) and [SpotBugs](https://spotbugs.github.io/):
+
+- **Prettier** enforces a consistent style by parsing your code and re-printing it with its own rules, wrapping code when necessary.
+- **Checkstyle** finds class design problems, method design problems, and others. It also has the ability to check code layout and formatting issues.
+- **PMD** finds common programming flaws like unused variables, empty catch blocks, unnecessary object creation, and so forth.
+- **SpotBugs** is used to perform static analysis on Java code. It looks for instances of "bug patterns".
+
+To enforce all best practices, you can use the next command:
 
 ```bash
-./mvnw checkstyle:check
+./mvnw exec:exec -Plint
 ```
+
+Many problems can be automatically fixed with `./mvnw exec:exec -Pformat` command.
+Depending on our editor, you may want to add an editor extension to lint and format your code while you type or on-save.
 
 ## Running unit tests
 
 Unit tests are responsible for testing of individual methods or classes by supplying input and making sure the output is as expected.
 
-Use `./mvnw test` to execute the unit tests via [JUnit 5](https://junit.org/junit5/) and [Mockito](https://site.mockito.org/).
+To execute the unit tests, you can use the next command:
+
+```bash
+./mvnw test
+```
+
+[JUnit 5](https://junit.org/junit5/) and [Mockito](https://site.mockito.org/) are used in unit tests.
+It's a common requirement to run subsets of a test suite, such as when you're fixing a bug or developing a new test case.
+To run this through Maven, set the test property to a specific test case via the `./mvnw test -Dtest=SomeTestClass` command.
+For more details, you can see the [Running a Single Test](https://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html) page of the Maven documentation.
 
 This project uses [JaCoCo](https://www.eclemma.org/jacoco/) which provides code coverage metrics for Java.
 The minimum code coverage is set to 80%.
@@ -90,15 +120,26 @@ You can see the HTML coverage report opening the [index.html](target/site/jacoco
 
 Integration tests determine if independently developed units of software work correctly when they are connected to each other.
 
-Use `./mvnw verify -DskipUTs` to execute the integration tests via [JUnit 5](https://junit.org/junit5/), [Testcontainers](https://www.testcontainers.org/) and [REST Assured](https://rest-assured.io/).
+To execute the integration tests, you can use the next command:
+
+```bash
+./mvnw verify -DskipUTs
+```
+
+[JUnit 5](https://junit.org/junit5/), [Testcontainers](https://www.testcontainers.org/) and [REST Assured](https://rest-assured.io/) are used in integration tests.
 The first time, you need to build the Docker image used in the integration tests. See [Building and deploying](#building-and-deploying) section.
 
 Like unit tests, you can also run subsets of a test suite.
+See the [Running a Single Test](https://maven.apache.org/surefire/maven-failsafe-plugin/examples/single-test.html) page of the Maven documentation.
 
 ## Debugging
 
 You can debug the source code, add breakpoints, inspect variables and view the application's call stack.
-Also, you can use the IDE for debugging the source code and unit tests.
+Also, you can use the IDE for debugging the source code, unit and integration tests.
+You can customize the log verbosity of Maven using the `-e` or `-errors` option to see the full stacktrace and the `-X` or `-debug` option to see logs at debug level.
+
+This project includes [Swagger](https://swagger.io/).
+To get a visual representation of the interface and send requests for testing purposes go to <http://localhost:8080/microprofile-api/openapi-ui/>.
 
 ## Commit messages convention
 
@@ -137,23 +178,21 @@ The subject contains a succinct description of the change.
 
 ## Building and deploying
 
+In `ci` folder you can find scripts for your [Jenkins](https://www.jenkins.io/) CI pipeline and an example for deploying your application with [Ansible](https://www.ansible.com/) to [Docker Swarm](https://docs.docker.com/engine/swarm/).
+
 This project uses [Maven Release Plugin](https://maven.apache.org/maven-release/maven-release-plugin/) to release a project with Maven.
 To create the first SNAPSHOT version, you must execute the commands `./mvnw release:prepare` and `./mvnw release:perform`.
+You can generate the changelog from GIT repository via `./mvnw generate-sources -Pchangelog` command.
 
-You can generate the changelog from GIT repository via `./mvnw generate-sources` command.
-
-Use the next command to build the Docker image of this application:
-
-```bash
-docker build -t microprofile-api .
-```
-
-In `ci` folder you can find scripts for your [Jenkins](https://www.jenkins.io/) CI pipeline and an example for deploying your application with [Ansible](https://www.ansible.com/) to [Docker Swarm](https://docs.docker.com/engine/swarm/).
-Use the next command to deploy the application to Docker Swarm via Ansible:
+This project contains a Dockerfile that you can use to build your Docker image.
+To build the Docker image, you can use the next command:
 
 ```bash
-ansible-playbook ci/deploy/deploy-to-swarm.yaml
+docker build -f src/main/docker/Dockerfile -t microprofile-api .
 ```
+
+Then you can verify the built image via `docker images` command.
+Also, you can deploy this project to Docker Swarm using `ansible-playbook ci/deploy/deploy-to-swarm.yaml` command.
 
 ## Reference documentation
 

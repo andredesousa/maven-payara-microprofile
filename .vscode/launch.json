@@ -3,11 +3,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Payara application",
+      "preLaunchTask": "start",
       "type": "java",
       "request": "attach",
       "hostName": "localhost",
-      "name": "payara-server",
-      "port": 9009,
+      "port": 5005
     }
   ]
 }

@@ -16,14 +16,18 @@ class ApplicationIT {
 
     @Container
     GenericContainer<?> app = new GenericContainer<>("microprofile-api")
-            .withExposedPorts(8080)
-            .waitingFor(Wait.forLogMessage(".*Payara Micro URLs.*\\n", 1));
+        .withExposedPorts(8080)
+        .waitingFor(Wait.forLogMessage(".*Payara Micro URLs.*\\n", 1));
 
     @Test
     @DisplayName("/microprofile-api (GET)")
     public void testHelloEndpoint() {
-        given().port(app.getFirstMappedPort())
-                .when().get("/microprofile-api")
-                .then().statusCode(200).body(is("Enjoy Jakarta EE with MicroProfile 4+!"));
+        given()
+            .port(app.getFirstMappedPort())
+            .when()
+            .get("/microprofile-api")
+            .then()
+            .statusCode(200)
+            .body(is("Enjoy Jakarta EE with MicroProfile 4+!"));
     }
 }

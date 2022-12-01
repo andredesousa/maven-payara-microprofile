@@ -22,12 +22,12 @@ pipeline {
     }
     stage('Code Analysis') {
       steps {
-        sh './mvnw checkstyle:check'
+        sh './mvnw exec:exec -Plint'
       }
     }
     stage('Unit Tests') {
       steps {
-        sh './mvnw test'
+        sh './mvnw verify -DskipITs'
       }
     }
     stage('Build Docker') {

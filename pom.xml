@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>app</groupId>
     <artifactId>microprofile-api</artifactId>
@@ -9,6 +9,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <failOnMissingWebXml>false</failOnMissingWebXml>
+        <version.exec-plugin>3.1.0</version.exec-plugin>
         <skipTests>false</skipTests>
         <skipITs>${skipTests}</skipITs>
         <skipUTs>${skipTests}</skipUTs>
@@ -89,16 +90,39 @@
                 <version>3.8.1</version>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <groupId>fish.payara.maven.plugins</groupId>
+                <artifactId>payara-micro-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>app.JAXRSApplication</mainClass>
-                        </manifest>
-                    </archive>
+                    <payaraVersion>5.2022.4</payaraVersion>
+                    <artifactItem>
+                        <groupId>fish.payara.extras</groupId>
+                        <artifactId>payara-micro</artifactId>
+                        <version>5.2022.4</version>
+                    </artifactItem>
+                    <deployWar>true</deployWar>
+                    <commandLineOptions>
+                        <option>
+                            <key>--rootdir</key>
+                            <value>${java.io.tmpdir}${file.separator}${project.artifactId}${file.separator}payara-micro}</value>
+                        </option>
+                    </commandLineOptions>
+                    <javaCommandLineOptions>
+                        <option>
+                            <value>-Xdebug</value>
+                        </option>
+                        <option>
+                            <key>-Xrunjdwp:transport</key>
+                            <value>dt_socket,server=y,suspend=y,address=5005</value>
+                        </option>
+                    </javaCommandLineOptions>
                 </configuration>
             </plugin>
             <plugin>
@@ -188,6 +212,7 @@
                 <version>0.8.7</version>
                 <configuration>
                     <append>true</append>
+                    <skip>${skipUTs}</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -231,21 +256,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>io.github.phillipuniverse</groupId>
                 <artifactId>githook-maven-plugin</artifactId>
                 <version>1.0.5</version>
@@ -274,24 +284,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>se.bjurr.gitchangelog</groupId>
-                <artifactId>git-changelog-maven-plugin</artifactId>
-                <version>1.92</version>
-                <executions>
-                    <execution>
-                        <id>GenerateGitChangelog</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>git-changelog</goal>
-                        </goals>
-                        <configuration>
-                            <templateFile>changelog.mustache</templateFile>
-							<file>CHANGELOG.md</file>
-						</configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>3.0.0-M5</version>
@@ -301,4 +293,117 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>lint</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${version.exec-plugin}</version>
+                        <configuration>
+                            <executable>./mvnw</executable>
+                            <arguments>
+                                <argument>pmd:pmd</argument>
+                                <argument>spotbugs:check</argument>
+                                <argument>spotless:check</argument>
+                                <argument>-Plint</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>3.1.2</version>
+                        <configuration>
+                            <configLocation>checkstyle.xml</configLocation>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <version>3.19.0</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <version>4.7.3.0</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.diffplug.spotless</groupId>
+                        <artifactId>spotless-maven-plugin</artifactId>
+                        <version>2.28.0</version>
+                        <configuration>
+                            <java>
+                                <includes>
+                                    <include>src/**/*.java</include>
+                                </includes>
+                                <importOrder />
+                                <removeUnusedImports />
+                            </java>
+                            <formats>
+                                <format>
+                                    <includes>
+                                        <include>src/**/*.java</include>
+                                    </includes>
+                                    <prettier>
+                                        <devDependencies>
+                                            <prettier>2.7.1</prettier>
+                                            <prettier-plugin-java>1.6.2</prettier-plugin-java>
+                                        </devDependencies>
+                                        <configFile>.prettierrc</configFile>
+                                    </prettier>
+                                </format>
+                            </formats>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>format</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${version.exec-plugin}</version>
+                        <configuration>
+                            <executable>./mvnw</executable>
+                            <arguments>
+                                <argument>spotless:apply</argument>
+                                <argument>-Plint</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>changelog</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>se.bjurr.gitchangelog</groupId>
+                        <artifactId>git-changelog-maven-plugin</artifactId>
+                        <version>1.92</version>
+                        <executions>
+                            <execution>
+                                <id>GenerateGitChangelog</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>git-changelog</goal>
+                                </goals>
+                                <configuration>
+                                    <templateFile>changelog.mustache</templateFile>
+                                    <file>CHANGELOG.md</file>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

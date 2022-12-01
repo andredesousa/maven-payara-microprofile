@@ -8,6 +8,4 @@ import javax.ws.rs.core.Application;
  * Delete this class, if you are not exposing JAX-RS resources in your application.
  */
 @ApplicationPath("/")
-public class JAXRSApplication extends Application {
-
-}
+public class JAXRSApplication extends Application {}
