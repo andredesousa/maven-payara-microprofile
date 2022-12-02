@@ -183,14 +183,15 @@ This project uses [Maven Release Plugin](https://maven.apache.org/maven-release/
 To create the first SNAPSHOT version, you must execute the commands `./mvnw release:prepare` and `./mvnw release:perform`.
 You can generate the changelog from GIT repository via `./mvnw generate-sources -Pchangelog` command.
 
-This project contains a Dockerfile that you can use to build your Docker image.
-To build the Docker image, you can use the next command:
+To create a Docker image, you can use the next command:
 
 ```bash
 ./mvnw docker:build
 ```
 
+This project provides a Dockerfile to build your Docker image.
 Then you can verify the built image via `docker images` command.
+
 Also, you can deploy this project to Docker Swarm using `ansible-playbook ci/deploy/deploy-to-swarm.yaml` command.
 
 ## Reference documentation
