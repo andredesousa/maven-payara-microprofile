@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("JAXRSApplication")
 class JAXRSApplicationTests {
 
-    JAXRSApplication app;
+    transient JAXRSApplication app;
 
     @BeforeEach
     void beforeEach() throws Exception {

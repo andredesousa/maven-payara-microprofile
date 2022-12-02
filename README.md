@@ -45,7 +45,6 @@ Based on best practices from the community, other github projects and developer 
 ├── .prettierrc
 ├── changelog.mustache
 ├── checkstyle.xml
-├── Dockerfile
 ├── LICENSE
 ├── mvnw
 ├── mvnw.cmd
@@ -69,7 +68,7 @@ To build and serve the application, you can use the next command:
 ```
 
 Alternatively, you can run the application on your local [Payara Server](https://www.payara.fish/) instance.
-First, you need to build the project with `./mvnw clean package` command.
+First, you need to build the project with `./mvnw clean package -DskipTests` command.
 After build de application, you can deploy the [microprofile-api.war](target/microprofile-api.war) on Payara Server.
 
 This application includes [Swagger](https://swagger.io/).
@@ -104,7 +103,7 @@ Unit tests are responsible for testing of individual methods or classes by suppl
 To execute the unit tests, you can use the next command:
 
 ```bash
-./mvnw test
+./mvnw verify -DskipITs
 ```
 
 [JUnit 5](https://junit.org/junit5/) and [Mockito](https://site.mockito.org/) are used in unit tests.

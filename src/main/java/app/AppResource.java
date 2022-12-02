@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 public class AppResource {
 
     @Inject
-    private AppService appService;
+    private transient AppService appService;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)

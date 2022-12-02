@@ -9,7 +9,7 @@ public class AppService {
 
     @Inject
     @ConfigProperty(name = "message")
-    private String message;
+    private transient String message;
 
     public String hello() {
         return message;

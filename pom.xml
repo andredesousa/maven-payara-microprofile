@@ -9,13 +9,14 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <failOnMissingWebXml>false</failOnMissingWebXml>
+        <script.executor>mvnw</script.executor>
         <version.exec-plugin>3.1.0</version.exec-plugin>
         <skipTests>false</skipTests>
         <skipITs>${skipTests}</skipITs>
         <skipUTs>${skipTests}</skipUTs>
     </properties>
     <scm>
-        <developerConnection>scm:git:https://github.com/andredesousa/essential-microprofile-scaffold.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/andredesousa/maven-payara-microprofile.git</developerConnection>
         <tag>@{project.version}</tag>
     </scm>
     <dependencies>
@@ -102,11 +103,6 @@
                 </executions>
                 <configuration>
                     <payaraVersion>5.2022.4</payaraVersion>
-                    <artifactItem>
-                        <groupId>fish.payara.extras</groupId>
-                        <artifactId>payara-micro</artifactId>
-                        <version>5.2022.4</version>
-                    </artifactItem>
                     <deployWar>true</deployWar>
                     <commandLineOptions>
                         <option>
@@ -303,7 +299,7 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>${version.exec-plugin}</version>
                         <configuration>
-                            <executable>./mvnw</executable>
+                            <executable>${script.executor}</executable>
                             <arguments>
                                 <argument>pmd:pmd</argument>
                                 <argument>spotbugs:check</argument>
@@ -370,7 +366,7 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>${version.exec-plugin}</version>
                         <configuration>
-                            <executable>./mvnw</executable>
+                            <executable>${script.executor}</executable>
                             <arguments>
                                 <argument>spotless:apply</argument>
                                 <argument>-Plint</argument>
@@ -404,6 +400,17 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>Windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <script.executor>mvnw.cmd</script.executor>
+            </properties>
         </profile>
     </profiles>
 </project>

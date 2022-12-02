@@ -15,7 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class ApplicationIT {
 
     @Container
-    GenericContainer<?> app = new GenericContainer<>("microprofile-api")
+    static GenericContainer<?> app = new GenericContainer<>("microprofile-api")
         .withExposedPorts(8080)
         .waitingFor(Wait.forLogMessage(".*Payara Micro URLs.*\\n", 1));
 
