@@ -187,7 +187,7 @@ This project contains a Dockerfile that you can use to build your Docker image.
 To build the Docker image, you can use the next command:
 
 ```bash
-docker build -f src/main/docker/Dockerfile -t microprofile-api .
+./mvnw docker:build
 ```
 
 Then you can verify the built image via `docker images` command.

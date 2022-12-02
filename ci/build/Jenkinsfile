@@ -30,14 +30,9 @@ pipeline {
         sh './mvnw verify -DskipITs'
       }
     }
-    stage('Build Docker') {
-      steps {
-        sh 'docker build -t microprofile-api .'
-      }
-    }
     stage('Integration Tests') {
       steps {
-        sh './mvnw verify -DskipUTs'
+        sh './mvnw docker:build verify -DskipUTs'
       }
     }
   }
