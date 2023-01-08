@@ -116,7 +116,7 @@
                         </option>
                         <option>
                             <key>-Xrunjdwp:transport</key>
-                            <value>dt_socket,server=y,suspend=y,address=5005</value>
+                            <value>dt_socket,server=y,suspend=n,address=5005</value>
                         </option>
                     </javaCommandLineOptions>
                 </configuration>
